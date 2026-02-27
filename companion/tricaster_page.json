@@ -1,0 +1,1332 @@
+{
+  "version": 4,
+  "type": "page",
+  "page": {
+    "name": "TriCaster",
+    "gridSize": {
+      "minColumn": 0,
+      "maxColumn": 7,
+      "minRow": 0,
+      "maxRow": 3
+    },
+    "controls": {
+      "0/0": {
+        "type": "button",
+        "style": {
+          "text": "OPEN\nLIVEPANEL",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r0c0_0",
+                  "action": "browser_url",
+                  "instance": "internal",
+                  "options": { "url": "http://192.168.1.94/" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "0/1": {
+        "type": "button",
+        "style": {
+          "text": "LOAD\nSESSION",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r0c1_0",
+                  "action": "customMacro",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "macroName": "YOUR_LOAD_SESSION_MACRO" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "0/2": {
+        "type": "button",
+        "style": {
+          "text": "",
+          "size": "auto",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "0/3": {
+        "type": "button",
+        "style": {
+          "text": "FADE\nTO BLACK",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r0c3_0",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "main_ftb_auto", "customValue": "1" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "0/4": {
+        "type": "button",
+        "style": {
+          "text": "AUTO",
+          "size": "18",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r0c4_0",
+                  "action": "auto",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": {},
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "0/5": {
+        "type": "button",
+        "style": {
+          "text": "CUT",
+          "size": "18",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r0c5_0",
+                  "action": "take",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": {},
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "0/6": {
+        "type": "button",
+        "style": {
+          "text": "RECORD",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r0c6_0",
+            "type": "recording",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": {},
+            "style": { "bgcolor": 16711680, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r0c6_s0",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "record_toggle", "customValue": "1" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          },
+          "1": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r0c6_s1",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "record_toggle", "customValue": "0" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "0/7": {
+        "type": "button",
+        "style": {
+          "text": "STREAM",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r0c7_0",
+            "type": "streaming",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": {},
+            "style": { "bgcolor": 16711680, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r0c7_s0",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "streaming_toggle", "customValue": "1" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          },
+          "1": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r0c7_s1",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "streaming_toggle", "customValue": "0" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+
+      "1/0": {
+        "type": "button",
+        "style": {
+          "text": "IN 1\nPGM",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 3342336,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r1c0_0",
+            "type": "tally_PGM",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "input1" },
+            "style": { "bgcolor": 16711680, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r1c0_0",
+                  "action": "source_pgm",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "input1" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "1/1": {
+        "type": "button",
+        "style": {
+          "text": "IN 2\nPGM",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 3342336,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r1c1_0",
+            "type": "tally_PGM",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "input2" },
+            "style": { "bgcolor": 16711680, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r1c1_0",
+                  "action": "source_pgm",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "input2" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "1/2": {
+        "type": "button",
+        "style": {
+          "text": "IN 3\nPGM",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 3342336,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r1c2_0",
+            "type": "tally_PGM",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "input3" },
+            "style": { "bgcolor": 16711680, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r1c2_0",
+                  "action": "source_pgm",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "input3" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "1/3": {
+        "type": "button",
+        "style": {
+          "text": "IN 4\nPGM",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 3342336,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r1c3_0",
+            "type": "tally_PGM",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "input4" },
+            "style": { "bgcolor": 16711680, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r1c3_0",
+                  "action": "source_pgm",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "input4" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "1/4": {
+        "type": "button",
+        "style": {
+          "text": "DDR 1\nPGM",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 3342336,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r1c4_0",
+            "type": "tally_PGM",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "ddr1" },
+            "style": { "bgcolor": 16711680, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r1c4_0",
+                  "action": "source_pgm",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "ddr1" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "1/5": {
+        "type": "button",
+        "style": {
+          "text": "DDR 2\nPGM",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 3342336,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r1c5_0",
+            "type": "tally_PGM",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "ddr2" },
+            "style": { "bgcolor": 16711680, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r1c5_0",
+                  "action": "source_pgm",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "ddr2" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "1/6": {
+        "type": "button",
+        "style": {
+          "text": "GFX 1\nPGM",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 3342336,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r1c6_0",
+            "type": "tally_PGM",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "gfx1" },
+            "style": { "bgcolor": 16711680, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r1c6_0",
+                  "action": "source_pgm",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "gfx1" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "1/7": {
+        "type": "button",
+        "style": {
+          "text": "GFX 2\nPGM",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 3342336,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r1c7_0",
+            "type": "tally_PGM",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "gfx2" },
+            "style": { "bgcolor": 16711680, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r1c7_0",
+                  "action": "source_pgm",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "gfx2" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+
+      "2/0": {
+        "type": "button",
+        "style": {
+          "text": "IN 1\nPVW",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 13056,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r2c0_0",
+            "type": "tally_PVW",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "input1" },
+            "style": { "bgcolor": 32768, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r2c0_0",
+                  "action": "source_pvw",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "input1" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "2/1": {
+        "type": "button",
+        "style": {
+          "text": "IN 2\nPVW",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 13056,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r2c1_0",
+            "type": "tally_PVW",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "input2" },
+            "style": { "bgcolor": 32768, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r2c1_0",
+                  "action": "source_pvw",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "input2" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "2/2": {
+        "type": "button",
+        "style": {
+          "text": "IN 3\nPVW",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 13056,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r2c2_0",
+            "type": "tally_PVW",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "input3" },
+            "style": { "bgcolor": 32768, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r2c2_0",
+                  "action": "source_pvw",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "input3" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "2/3": {
+        "type": "button",
+        "style": {
+          "text": "IN 4\nPVW",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 13056,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r2c3_0",
+            "type": "tally_PVW",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "input4" },
+            "style": { "bgcolor": 32768, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r2c3_0",
+                  "action": "source_pvw",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "input4" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "2/4": {
+        "type": "button",
+        "style": {
+          "text": "DDR 1\nPVW",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 13056,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r2c4_0",
+            "type": "tally_PVW",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "ddr1" },
+            "style": { "bgcolor": 32768, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r2c4_0",
+                  "action": "source_pvw",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "ddr1" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "2/5": {
+        "type": "button",
+        "style": {
+          "text": "DDR 2\nPVW",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 13056,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r2c5_0",
+            "type": "tally_PVW",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "ddr2" },
+            "style": { "bgcolor": 32768, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r2c5_0",
+                  "action": "source_pvw",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "ddr2" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "2/6": {
+        "type": "button",
+        "style": {
+          "text": "GFX 1\nPVW",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 13056,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r2c6_0",
+            "type": "tally_PVW",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "gfx1" },
+            "style": { "bgcolor": 32768, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r2c6_0",
+                  "action": "source_pvw",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "gfx1" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "2/7": {
+        "type": "button",
+        "style": {
+          "text": "GFX 2\nPVW",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 13056,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r2c7_0",
+            "type": "tally_PVW",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "src": "gfx2" },
+            "style": { "bgcolor": 32768, "color": 16777215 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r2c7_0",
+                  "action": "source_pvw",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "source": "gfx2" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+
+      "3/0": {
+        "type": "button",
+        "style": {
+          "text": "DSK 1",
+          "size": "18",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r3c0_0",
+            "type": "dskOnAir",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "target": "main_dsk1" },
+            "style": { "bgcolor": 16776960, "color": 0 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r3c0_0",
+                  "action": "auto_dsk",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "dsk": "dsk1" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "3/1": {
+        "type": "button",
+        "style": {
+          "text": "DSK 2",
+          "size": "18",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [
+          {
+            "id": "f_r3c1_0",
+            "type": "dskOnAir",
+            "instance_id": "TRICASTER_INSTANCE_ID",
+            "options": { "target": "main_dsk2" },
+            "style": { "bgcolor": 16776960, "color": 0 },
+            "isInverted": false
+          }
+        ],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r3c1_0",
+                  "action": "auto_dsk",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "dsk": "dsk2" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "3/2": {
+        "type": "button",
+        "style": {
+          "text": "",
+          "size": "auto",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "3/3": {
+        "type": "button",
+        "style": {
+          "text": "",
+          "size": "auto",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "3/4": {
+        "type": "button",
+        "style": {
+          "text": "MUTE\nMASTER",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r3c4_s0",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "master_mute", "customValue": "true" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          },
+          "1": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r3c4_s1",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "master_mute", "customValue": "false" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "3/5": {
+        "type": "button",
+        "style": {
+          "text": "MUTE\nIN 1",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r3c5_s0",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "input1_mute", "customValue": "true" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          },
+          "1": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r3c5_s1",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "input1_mute", "customValue": "false" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "3/6": {
+        "type": "button",
+        "style": {
+          "text": "MUTE\nIN 2",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r3c6_s0",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "input2_mute", "customValue": "true" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          },
+          "1": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r3c6_s1",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "input2_mute", "customValue": "false" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      },
+      "3/7": {
+        "type": "button",
+        "style": {
+          "text": "MUTE\nIN 3",
+          "size": "14",
+          "color": 16777215,
+          "bgcolor": 0,
+          "png": null,
+          "alignment": "center:center",
+          "pngalignment": "center:center",
+          "show_topbar": false
+        },
+        "feedbacks": [],
+        "steps": {
+          "0": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r3c7_s0",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "input3_mute", "customValue": "true" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          },
+          "1": {
+            "action_sets": {
+              "down": [
+                {
+                  "id": "a_r3c7_s1",
+                  "action": "custom",
+                  "instance": "TRICASTER_INSTANCE_ID",
+                  "options": { "customName": "input3_mute", "customValue": "false" },
+                  "delay": 0
+                }
+              ],
+              "up": [],
+              "rotate_left": [],
+              "rotate_right": []
+            },
+            "options": { "runWhileHeld": [] }
+          }
+        }
+      }
+    }
+  }
+}
