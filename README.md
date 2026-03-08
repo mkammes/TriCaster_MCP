@@ -6,6 +6,10 @@ Tested against: **TriCaster Mini S, v8-5, 1080p29.97**
 
 ---
 
+<img width="2368" height="2002" alt="image" src="https://github.com/user-attachments/assets/130f0e83-d10e-4f47-ac68-f4ac27c36b23" />
+
+---
+
 ## What you need before starting
 
 - **Claude Desktop** installed on your computer (download from [claude.ai/download](https://claude.ai/download))
