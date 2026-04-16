@@ -140,7 +140,7 @@ You can also set `TRICASTER_PORT` the same way if your TriCaster isn't on port 8
 2. Open the file `server.py` in a text editor. On macOS you can right-click it and choose **Open With → TextEdit**. On Windows, right-click and choose **Open With → Notepad**.
 3. Near the very top of the file, find this line:
    ```python
-   TRICASTER_HOST = os.environ.get("TRICASTER_HOST", "10.10.13.162")
+   TRICASTER_HOST = os.environ.get("TRICASTER_HOST", "192.168.1.94")
    ```
 4. Replace the fallback IP address with the IP address of your TriCaster. You can find the TriCaster's IP address in its network settings on the TriCaster itself, or by checking your router's connected devices list.
 5. Save the file.

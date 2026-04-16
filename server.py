@@ -539,8 +539,9 @@ def _handle(name: str, args: dict) -> str:
         return _parse_tally(xml)
 
     if name == "list_sources":
-        xml = dictionary("tally")
-        return _parse_source_list(xml)
+        tally_xml = dictionary("tally")
+        switcher_xml = dictionary("switcher")
+        return _parse_source_list(tally_xml, switcher_xml)
 
     # ── Switcher ─────────────────────────────────────────────────────────
     if name == "get_switcher_state":
@@ -566,9 +567,17 @@ def _handle(name: str, args: dict) -> str:
         return f"Cut transition executed. Response: {resp}"
 
     if name == "set_transition_effect":
-        effect = args["effect"]
-        resp = shortcut("main_background_effect_select", effect)
-        return f"Transition effect set to '{effect}'. Response: {resp}"
+        effect = args["effect"].lower()
+        if effect in ("fade", "dissolve"):
+            resp = shortcut("main_background_select_fade", "true")
+            return f"Transition effect set to fade/dissolve. Response: {resp}"
+        elif effect == "cut":
+            resp = shortcut("main_background_select_fade", "false")
+            return f"Transition effect set to cut. Response: {resp}"
+        else:
+            # Try selecting by effect path/name for file-based effects
+            resp = shortcut("main_background_effect_select", args["effect"])
+            return f"Transition effect '{args['effect']}' selected. Response: {resp}"
 
     # ── DSK ──────────────────────────────────────────────────────────────
     if name == "dsk_on":
@@ -627,8 +636,9 @@ def _handle(name: str, args: dict) -> str:
 
     # ── Audio mixer ──────────────────────────────────────────────────────
     if name == "get_audio_state":
-        xml = dictionary("audiomixer")
-        return _parse_audio_state(xml)
+        mixer_xml = dictionary("audiomixer")
+        state_xml = dictionary("shortcut_states")
+        return _parse_audio_state(mixer_xml, state_xml)
 
     if name == "set_audio_mute":
         channel = args["channel"]
@@ -715,21 +725,18 @@ def _handle(name: str, args: dict) -> str:
 # ---------------------------------------------------------------------------
 
 def _get_shortcut_state(shortcut_name: str, label: str) -> str:
-    """Read a single shortcut value from the switcher dictionary (faster than shortcut_states)."""
-    # Try the switcher dictionary first — smaller payload than shortcut_states (~400KB).
-    # Fall back to shortcut_states if not found.
-    for dict_key in ("switcher", "shortcut_states"):
-        try:
-            xml = dictionary(dict_key)
-            root = ET.fromstring(xml)
-            for el in root.iter():
-                if el.get("name") == shortcut_name:
-                    val = el.get("value", "unknown")
-                    state = "active" if val not in ("0", "false", "") else "inactive"
-                    return f"{label}: {state} (raw value: {val!r})"
-        except ET.ParseError:
-            continue
-    return f"{label}: unknown (shortcut '{shortcut_name}' not found)"
+    """Read a single shortcut value from shortcut_states."""
+    try:
+        xml = dictionary("shortcut_states")
+        root = ET.fromstring(xml)
+        for el in root:
+            if el.get("name") == shortcut_name:
+                val = el.get("value", "unknown")
+                state = "active" if val not in ("0", "false", "") else "inactive"
+                return f"{label}: {state} (raw value: {val!r})"
+        return f"{label}: unknown (shortcut '{shortcut_name}' not found in shortcut_states)"
+    except ET.ParseError:
+        return f"{label}: parse error reading shortcut_states"
 
 
 def _parse_tally(xml: str) -> str:
@@ -748,138 +755,198 @@ def _parse_tally(xml: str) -> str:
         return xml
 
 
-def _parse_source_list(xml: str) -> str:
-    """Extract all source names from tally XML."""
+def _parse_source_list(tally_xml: str, switcher_xml: str) -> str:
+    """List all sources from tally, annotated with friendly labels from the switcher."""
+    # Build label map from switcher XML: physical_input_number → iso_label
+    labels: dict[str, str] = {}
     try:
-        root = ET.fromstring(xml)
+        sw_root = ET.fromstring(switcher_xml)
+        for inp in sw_root.findall(".//physical_input"):
+            phys = inp.get("physical_input_number", "").lower()
+            label = inp.get("iso_label", "")
+            if phys and label:
+                labels[phys] = label
+    except ET.ParseError:
+        pass
+
+    try:
+        root = ET.fromstring(tally_xml)
         sources = [c.get("name") for c in root if c.get("name")]
         if not sources:
-            return "No sources found.\n\nRaw:\n" + xml
-        return "=== Available Sources ===\n" + "\n".join(f"  {s}" for s in sources)
+            return "No sources found.\n\nRaw:\n" + tally_xml
+        lines = ["=== Available Sources ==="]
+        for s in sources:
+            label = labels.get(s, "")
+            suffix = f"  ({label})" if label else ""
+            lines.append(f"  {s}{suffix}")
+        return "\n".join(lines)
     except ET.ParseError:
-        return xml
+        return tally_xml
 
 
 def _parse_switcher_state(xml: str) -> str:
-    """Parse switcher XML into a human-readable summary."""
+    """Parse switcher XML into a human-readable summary.
+
+    The TriCaster returns <switcher_update main_source="INPUT3" preview_source="INPUT5" effect="...">
+    with a <tbar position="..."> child and <switcher_overlays> for DSK layers.
+    """
     try:
         root = ET.fromstring(xml)
 
-        def find_attr(tag: str, attr: str, default: str = "(unknown)") -> str:
-            el = root.find(f".//{tag}")
-            return el.get(attr, default) if el is not None else default
+        pgm = root.get("main_source", "(unknown)")
+        prev = root.get("preview_source", "(unknown)")
+        effect = root.get("effect", "") or "cut"
 
-        # Program / Preview
-        pgm = root.find(".//program") or root.find(".//a_row")
-        prev = root.find(".//preview") or root.find(".//b_row")
-        pgm_src = pgm.get("source", pgm.get("name", "(unknown)")) if pgm is not None else "(unknown)"
-        prev_src = prev.get("source", prev.get("name", "(unknown)")) if prev is not None else "(unknown)"
-
-        # Active transition effect
-        effect_el = root.find(".//transition") or root.find(".//effect")
-        effect = effect_el.get("name", effect_el.get("value", "(unknown)")) if effect_el is not None else "(unknown)"
-
-        # T-bar position
-        tbar_el = root.find(".//tbar") or root.find(".//t_bar")
-        tbar = tbar_el.get("value", "(unknown)") if tbar_el is not None else "(unknown)"
+        tbar_el = root.find(".//tbar")
+        tbar = tbar_el.get("position", "(unknown)") if tbar_el is not None else "(unknown)"
 
         lines = [
             "=== Switcher State ===",
-            f"Program:    {pgm_src}",
-            f"Preview:    {prev_src}",
+            f"Program:    {pgm}",
+            f"Preview:    {prev}",
             f"Effect:     {effect}",
             f"T-bar:      {tbar}",
         ]
 
-        # DSK states
-        for dsk_el in root.findall(".//dsk"):
-            dsk_name = dsk_el.get("name", "")
-            dsk_on = dsk_el.get("on_air", dsk_el.get("active", ""))
-            if dsk_name:
-                lines.append(f"DSK {dsk_name}: {'ON' if dsk_on in ('true', '1') else 'off'}")
+        # Input labels (friendly names assigned in TriCaster)
+        labels = {}
+        for inp in root.findall(".//physical_input"):
+            phys = inp.get("physical_input_number", "")
+            label = inp.get("iso_label", "")
+            if phys and label:
+                labels[phys.lower()] = label
+        if labels:
+            lines.append("\nInput Labels:")
+            for k, v in labels.items():
+                lines.append(f"  {k}: {v}")
+
+        # DSK overlay sources
+        for i, ov in enumerate(root.findall(".//switcher_overlays/overlay"), 1):
+            src = ov.get("source", "")
+            eff = ov.get("effect", "") or "cut"
+            tbar_ov = ov.find(".//tbar")
+            pos = tbar_ov.get("position", "0") if tbar_ov is not None else "0"
+            if src:
+                lines.append(f"Overlay {i}: {src} (effect={eff}, tbar={pos})")
 
         return "\n".join(lines)
     except ET.ParseError:
         return xml
 
 
-def _parse_audio_state(xml: str) -> str:
-    """Parse audiomixer XML into a readable channel summary."""
+def _parse_audio_state(mixer_xml: str, state_xml: str) -> str:
+    """Build audio state from audiomixer (channel names) + shortcut_states (mute/volume values)."""
+    # Build display-name map from audiomixer
+    display_names: dict[str, str] = {}
     try:
-        root = ET.fromstring(xml)
-        lines = ["=== Audio Mixer State ==="]
-        channels_found = False
-
-        for ch in root.iter():
-            name = ch.get("name") or ch.get("id")
-            if not name:
-                continue
-            mute = ch.get("mute", ch.get("muted", ""))
-            volume = ch.get("volume", ch.get("gain", ch.get("level", "")))
-            if mute != "" or volume != "":
-                channels_found = True
-                mute_str = "MUTED" if mute in ("true", "1") else "unmuted" if mute != "" else ""
-                vol_str = f"vol={volume}" if volume != "" else ""
-                parts = [p for p in [mute_str, vol_str] if p]
-                lines.append(f"  {name}: {', '.join(parts) if parts else '(no data)'}")
-
-        if not channels_found:
-            lines.append("(No channel data found — raw XML returned)")
-            lines.append(xml)
-        return "\n".join(lines)
+        mixer_root = ET.fromstring(mixer_xml)
+        for el in mixer_root.iter():
+            name = el.get("name")
+            display = el.get("display_name")
+            if name and display:
+                display_names[name.lower()] = display
     except ET.ParseError:
-        return xml
+        pass
+
+    # Extract mute/volume from shortcut_states
+    mutes: dict[str, str] = {}
+    volumes: dict[str, str] = {}
+    try:
+        state_root = ET.fromstring(state_xml)
+        for el in state_root:
+            sc = el.get("name", "")
+            val = el.get("value", "")
+            if sc.endswith("_mute"):
+                ch = sc[: -len("_mute")]
+                mutes[ch] = val
+            elif sc.endswith("_volume"):
+                ch = sc[: -len("_volume")]
+                volumes[ch] = val
+    except ET.ParseError:
+        pass
+
+    if not mutes and not volumes:
+        return "Audio state unavailable (could not parse shortcut_states)"
+
+    lines = ["=== Audio Mixer State ==="]
+    all_channels = sorted(set(mutes) | set(volumes))
+    for ch in all_channels:
+        label = display_names.get(ch.lower(), ch)
+        mute_val = mutes.get(ch, "")
+        vol_val = volumes.get(ch, "")
+        mute_str = "MUTED" if mute_val in ("true", "1") else "unmuted" if mute_val else ""
+        vol_str = f"vol={vol_val}" if vol_val else ""
+        parts = [p for p in [mute_str, vol_str] if p]
+        lines.append(f"  {label} ({ch}): {', '.join(parts) if parts else '(no data)'}")
+
+    return "\n".join(lines)
 
 
 def _parse_ddr_status(xml: str, ddr: int) -> str:
-    """Parse ddr_timecode XML for a specific DDR."""
+    """Parse ddr_timecode XML for a specific DDR.
+
+    Real structure: <timecode><ddr1 clip_seconds_elapsed="0" clip_seconds_remaining="5" ... /></timecode>
+    """
     try:
         root = ET.fromstring(xml)
-
-        # Look for a DDR-specific element
-        ddr_el = root.find(f".//ddr[@id='{ddr}']") or root.find(f".//ddr{ddr}") or root.find(f".//*[@name='ddr{ddr}']")
+        ddr_el = root.find(f"ddr{ddr}")
         if ddr_el is None:
-            # Try children matching by index
-            ddrs = list(root.iter("ddr"))
-            ddr_el = ddrs[ddr - 1] if len(ddrs) >= ddr else None
+            return f"DDR{ddr} not found in timecode response (may have no clip loaded).\n\nRaw:\n{xml}"
 
-        if ddr_el is None:
-            return f"DDR{ddr} status: not found in response.\n\nRaw:\n{xml}"
+        elapsed = float(ddr_el.get("clip_seconds_elapsed", 0))
+        remaining = float(ddr_el.get("clip_seconds_remaining", 0))
+        duration = float(ddr_el.get("file_duration", 0))
+        speed = ddr_el.get("play_speed", "0")
+        num_clips = ddr_el.get("num_clips", "")
+        clip_index = ddr_el.get("clip_index", "")
+        framerate = ddr_el.get("clip_framerate", "")
 
-        lines = [f"=== DDR{ddr} Status ==="]
-        for attr in ("timecode", "position", "clip", "filename", "state", "playing", "loop", "autoplay", "duration"):
-            val = ddr_el.get(attr)
-            if val is not None:
-                lines.append(f"  {attr}: {val}")
+        playing = float(speed) != 0 if speed else False
+        state = "playing" if playing else "stopped"
 
-        if len(lines) == 1:
-            lines.append("(No detailed attributes found)")
-            lines.append(f"Raw element: {ET.tostring(ddr_el, encoding='unicode')}")
+        def fmt_time(s: float) -> str:
+            m, sec = divmod(int(s), 60)
+            return f"{m}:{sec:02d}"
 
+        lines = [
+            f"=== DDR{ddr} Status ===",
+            f"  State:     {state} (speed={speed})",
+            f"  Position:  {fmt_time(elapsed)} elapsed / {fmt_time(remaining)} remaining",
+            f"  Duration:  {fmt_time(duration)}",
+        ]
+        if num_clips:
+            lines.append(f"  Playlist:  clip {clip_index} of {num_clips}")
+        if framerate:
+            lines.append(f"  Framerate: {framerate}")
         return "\n".join(lines)
     except ET.ParseError:
         return xml
 
 
 def _parse_filebrowser(xml: str) -> str:
-    """Parse filebrowser XML into a readable file/folder list."""
+    """Parse filebrowser XML into a readable file list.
+
+    Real structure: <media><clips><file path="d:\\..." name="River Bridge" /></clips></media>
+    """
     try:
         root = ET.fromstring(xml)
         lines = ["=== Media Browser ==="]
-        entries = []
 
-        for el in root.iter():
-            name = el.get("name") or el.get("filename") or el.get("path")
+        # Group files by their parent folder
+        current_folder = ""
+        for el in root.iter("file"):
+            name = el.get("name", "")
+            path = el.get("path", "")
             if not name:
                 continue
-            kind = el.tag
-            entries.append(f"  [{kind}] {name}")
+            folder = path.rsplit("\\", 1)[0] if "\\" in path else ""
+            if folder != current_folder:
+                current_folder = folder
+                lines.append(f"\n  [{folder}]" if folder else "\n  [root]")
+            lines.append(f"    {name}")
 
-        if not entries:
-            lines.append("(No entries found — raw XML returned)")
-            lines.append(xml)
-        else:
-            lines.extend(entries)
+        if len(lines) == 1:
+            lines.append("(No media files found)")
         return "\n".join(lines)
     except ET.ParseError:
         return xml
