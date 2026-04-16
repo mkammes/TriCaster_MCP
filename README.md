@@ -114,15 +114,35 @@ This creates a folder called `TriCaster_MCP` containing all the server files. Yo
 
 ## Step 3 — Set your TriCaster's IP address
 
-You need to tell the server where your TriCaster is on the network.
+You need to tell the server where your TriCaster is on the network. There are two ways to do this:
+
+### Option A — Environment variable (recommended)
+
+Set the `TRICASTER_HOST` environment variable in your Claude Desktop config (see Step 5). This keeps your IP out of the source code and makes it easy to change without editing files.
+
+Add an `"env"` section to the tricaster entry in `claude_desktop_config.json`:
+
+```json
+"tricaster": {
+  "command": "/path/to/uv",
+  "args": [ "run", "--project", "/path/to/TriCaster_MCP", "python", "/path/to/TriCaster_MCP/server.py" ],
+  "env": {
+    "TRICASTER_HOST": "192.168.1.94"
+  }
+}
+```
+
+You can also set `TRICASTER_PORT` the same way if your TriCaster isn't on port 80.
+
+### Option B — Edit server.py directly
 
 1. Find the folder where you cloned the project (e.g. `Documents/TriCaster_MCP`)
 2. Open the file `server.py` in a text editor. On macOS you can right-click it and choose **Open With → TextEdit**. On Windows, right-click and choose **Open With → Notepad**.
 3. Near the very top of the file, find this line:
    ```python
-   TRICASTER_HOST = "192.168.1.94"
+   TRICASTER_HOST = os.environ.get("TRICASTER_HOST", "10.10.13.162")
    ```
-4. Replace `192.168.1.94` with the IP address of your TriCaster. You can find the TriCaster's IP address in its network settings on the TriCaster itself, or by checking your router's connected devices list.
+4. Replace the fallback IP address with the IP address of your TriCaster. You can find the TriCaster's IP address in its network settings on the TriCaster itself, or by checking your router's connected devices list.
 5. Save the file.
 
 ---
@@ -336,31 +356,44 @@ Once installed, Claude has access to the following tools for controlling your Tr
 
 | Tool | Description |
 |---|---|
+| **System** | |
 | `get_system_info` | TriCaster model, version, session name, and resolution |
 | `get_tally` | Shows which sources are currently on Program and Preview |
-| `get_switcher_state` | Full switcher state including sources, active effect, and T-bar position |
+| `list_sources` | List all available source names (inputs, DDRs, buffers, graphics, etc.) |
+| **Switcher** | |
+| `get_switcher_state` | Parsed switcher state: Program, Preview, active effect, T-bar position, DSK states |
 | `switch_program` | Cut directly to a new Program source (goes to air immediately) |
 | `switch_preview` | Arm a new source on Preview without going to air |
 | `auto_transition` | Perform an Auto transition, taking Preview to Program using the current effect |
 | `cut_transition` | Perform an instant Cut, swapping Program and Preview |
+| `set_transition_effect` | Change the active transition effect (e.g. Dissolve, Wipe) |
 | `fade_to_black` | Fade the program output to black; call again to fade back up |
 | `take_to_black` | Instantly cut the program output to black |
+| **DSK** | |
 | `dsk_on` / `dsk_off` / `dsk_auto` | Bring DSK 1 or 2 on air, take it off, or auto-transition it |
+| **Audio** | |
+| `get_audio_state` | Get current mute and volume state for all audio channels |
 | `set_audio_mute` | Mute or unmute an audio channel |
 | `set_audio_volume` | Set the volume/gain of an audio channel (0 = unity gain) |
+| **DDR (media players)** | |
+| `get_ddr_status` | Get playback state, timecode, clip name, loop/autoplay mode for a DDR |
 | `ddr_play` / `ddr_stop` | Start or stop playback on DDR media player 1 or 2 |
 | `ddr_set_loop` | Enable or disable loop mode on a DDR |
 | `ddr_set_autoplay` | Enable or disable autoplay mode on a DDR |
-| `start_record` / `stop_record` | Start or stop recording |
+| **Recording & Streaming** | |
+| `start_record` / `stop_record` | Start or stop recording (optional `recorder` param for multi-recorder systems) |
 | `get_record_state` | Check whether recording is currently active |
 | `start_stream` / `stop_stream` | Start or stop streaming |
 | `get_stream_state` | Check whether streaming is currently active |
+| **Media & Macros** | |
+| `browse_media` | Browse available media files on the TriCaster file system |
 | `list_macros` | List all macros available on the TriCaster |
 | `run_macro` | Execute a macro by name |
-| `get_dictionary` | Read any TriCaster state dictionary (returns raw XML — for advanced use) |
+| **Advanced** | |
+| `get_dictionary` | Read any TriCaster state dictionary (returns raw XML) |
 | `get_datalink` | Get all current DataLink key/value pairs (live data fields like scores, lower-thirds) |
 | `set_datalink` | Set a DataLink key to a value (e.g. update a score or lower-third text) |
-| `send_shortcut` | Send any raw shortcut command to the TriCaster (advanced) |
+| `send_shortcut` | Send any raw shortcut command to the TriCaster |
 
 ### Audio channel names
 
@@ -370,7 +403,7 @@ Use these names with `set_audio_mute` and `set_audio_volume`:
 
 ### Common source names
 
-Use these with `switch_program` and `switch_preview`:
+Use `list_sources` to see all sources your TriCaster actually exposes. Typical names:
 
 `input1` through `input8` — physical video inputs
 `ddr1`, `ddr2` — DDR media players
@@ -386,3 +419,4 @@ Use these with `switch_program` and `switch_preview`:
 - Communicates over HTTP/1.0 using Python's stdlib `http.client` with `Connection: close`
 - No third-party HTTP library required — the only external dependency is `mcp`
 - The server runs as a local subprocess launched by Claude Desktop over stdio — no ports are opened on your computer
+- TriCaster IP and port are read from `TRICASTER_HOST` / `TRICASTER_PORT` environment variables, with fallback to the values hardcoded in `server.py`

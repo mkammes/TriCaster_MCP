@@ -8,13 +8,13 @@ Reference: Vizrt Automation, Integration & Control User Guide v8-5
 import http.client
 import xml.etree.ElementTree as ET
 from urllib.parse import urlencode, quote
+import os
 import mcp.server.stdio
 from mcp.server import Server
 from mcp.types import Tool, TextContent
-import json
 
-TRICASTER_HOST = "192.168.1.94"
-TRICASTER_PORT = 80
+TRICASTER_HOST = os.environ.get("TRICASTER_HOST", "10.10.13.162")
+TRICASTER_PORT = int(os.environ.get("TRICASTER_PORT", "80"))
 TIMEOUT = 5
 
 
@@ -107,6 +107,14 @@ async def list_tools() -> list[Tool]:
             ),
             inputSchema={"type": "object", "properties": {}, "required": []},
         ),
+        Tool(
+            name="list_sources",
+            description=(
+                "List all available input sources by name (inputs, DDRs, buffers, graphics, etc.). "
+                "Use this to discover valid source names before calling switch_program or switch_preview."
+            ),
+            inputSchema={"type": "object", "properties": {}, "required": []},
+        ),
 
         # ── Switcher ───────────────────────────────────────────────────────
         Tool(
@@ -121,6 +129,7 @@ async def list_tools() -> list[Tool]:
             name="switch_program",
             description=(
                 "Cut directly to a new Program source (no transition). "
+                "Use list_sources to see valid source names. "
                 "Common sources: input1–inputN, ddr1, ddr2, gfx1, gfx2, bfr1–bfrN, black."
             ),
             inputSchema={
@@ -136,7 +145,10 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="switch_preview",
-            description="Set the Preview row to a new source without going to air.",
+            description=(
+                "Set the Preview row to a new source without going to air. "
+                "Use list_sources to see valid source names."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -160,6 +172,24 @@ async def list_tools() -> list[Tool]:
             name="cut_transition",
             description="Perform an instant Cut transition (Program ↔ Preview).",
             inputSchema={"type": "object", "properties": {}, "required": []},
+        ),
+        Tool(
+            name="set_transition_effect",
+            description=(
+                "Set the active transition effect on the main background switcher "
+                "(e.g. 'Cut', 'Dissolve', 'Wipe', or any effect name from the effects bin). "
+                "Use get_switcher_state to see available effects."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "effect": {
+                        "type": "string",
+                        "description": "Effect name, e.g. 'Dissolve', 'Wipe', 'Cut'",
+                    }
+                },
+                "required": ["effect"],
+            },
         ),
 
         # ── DSK (downstream keyers) ────────────────────────────────────────
@@ -208,18 +238,48 @@ async def list_tools() -> list[Tool]:
         # ── Recording ─────────────────────────────────────────────────────
         Tool(
             name="start_record",
-            description="Start recording on the primary recorder (recorder1).",
-            inputSchema={"type": "object", "properties": {}, "required": []},
+            description="Start recording. Optionally specify recorder number (default: 1).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "recorder": {
+                        "type": "integer",
+                        "description": "Recorder number (default 1)",
+                        "default": 1,
+                    }
+                },
+                "required": [],
+            },
         ),
         Tool(
             name="stop_record",
-            description="Stop recording on the primary recorder (recorder1).",
-            inputSchema={"type": "object", "properties": {}, "required": []},
+            description="Stop recording. Optionally specify recorder number (default: 1).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "recorder": {
+                        "type": "integer",
+                        "description": "Recorder number (default 1)",
+                        "default": 1,
+                    }
+                },
+                "required": [],
+            },
         ),
         Tool(
             name="get_record_state",
-            description="Get the current recording state (active/inactive) and filename.",
-            inputSchema={"type": "object", "properties": {}, "required": []},
+            description="Get the current recording state (active/inactive). Optionally specify recorder number (default: 1).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "recorder": {
+                        "type": "integer",
+                        "description": "Recorder number (default 1)",
+                        "default": 1,
+                    }
+                },
+                "required": [],
+            },
         ),
 
         # ── Streaming ─────────────────────────────────────────────────────
@@ -255,6 +315,14 @@ async def list_tools() -> list[Tool]:
         ),
 
         # ── Audio mixer ───────────────────────────────────────────────────
+        Tool(
+            name="get_audio_state",
+            description=(
+                "Get the current state of all audio channels: mute status and volume levels. "
+                "Returns a summary of the audio mixer."
+            ),
+            inputSchema={"type": "object", "properties": {}, "required": []},
+        ),
         Tool(
             name="set_audio_mute",
             description=(
@@ -300,6 +368,20 @@ async def list_tools() -> list[Tool]:
         ),
 
         # ── DDR (media players) ───────────────────────────────────────────
+        Tool(
+            name="get_ddr_status",
+            description=(
+                "Get the current status of a DDR (media player): playback state, "
+                "timecode position, clip name, loop, and autoplay mode."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "ddr": {"type": "integer", "description": "DDR number (1 or 2)", "enum": [1, 2]}
+                },
+                "required": ["ddr"],
+            },
+        ),
         Tool(
             name="ddr_play",
             description="Play a DDR (media player).",
@@ -347,6 +429,25 @@ async def list_tools() -> list[Tool]:
             },
         ),
 
+        # ── Media browser ─────────────────────────────────────────────────
+        Tool(
+            name="browse_media",
+            description=(
+                "Browse available media files on the TriCaster. "
+                "Optionally provide a path to browse a specific folder."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "path": {
+                        "type": "string",
+                        "description": "Optional folder path to browse (leave empty for root)",
+                    }
+                },
+                "required": [],
+            },
+        ),
+
         # ── Macros ────────────────────────────────────────────────────────
         Tool(
             name="list_macros",
@@ -385,7 +486,7 @@ async def list_tools() -> list[Tool]:
             name="get_dictionary",
             description=(
                 "Read any TriCaster state dictionary by key. "
-                "Common keys: switcher, tally, buffer, macros_list, switcher_ui_effects, filebrowser."
+                "Common keys: switcher, tally, buffer, macros_list, switcher_ui_effects, filebrowser, audiomixer, ddr_timecode."
             ),
             inputSchema={
                 "type": "object",
@@ -437,9 +538,14 @@ def _handle(name: str, args: dict) -> str:
         xml = dictionary("tally")
         return _parse_tally(xml)
 
+    if name == "list_sources":
+        xml = dictionary("tally")
+        return _parse_source_list(xml)
+
     # ── Switcher ─────────────────────────────────────────────────────────
     if name == "get_switcher_state":
-        return dictionary("switcher")
+        xml = dictionary("switcher")
+        return _parse_switcher_state(xml)
 
     if name == "switch_program":
         source = args["source"]
@@ -459,6 +565,11 @@ def _handle(name: str, args: dict) -> str:
         resp = shortcut("main_background_cut")
         return f"Cut transition executed. Response: {resp}"
 
+    if name == "set_transition_effect":
+        effect = args["effect"]
+        resp = shortcut("main_background_effect_select", effect)
+        return f"Transition effect set to '{effect}'. Response: {resp}"
+
     # ── DSK ──────────────────────────────────────────────────────────────
     if name == "dsk_on":
         dsk = args["dsk"]
@@ -477,15 +588,21 @@ def _handle(name: str, args: dict) -> str:
 
     # ── Recording ────────────────────────────────────────────────────────
     if name == "start_record":
-        resp = shortcut("record_toggle", "1")
-        return f"Record start sent. Response: {resp}"
+        recorder = args.get("recorder", 1)
+        shortcut_name = "record_toggle" if recorder == 1 else f"record{recorder}_toggle"
+        resp = shortcut(shortcut_name, "1")
+        return f"Recorder {recorder} start sent. Response: {resp}"
 
     if name == "stop_record":
-        resp = shortcut("record_toggle", "0")
-        return f"Record stop sent. Response: {resp}"
+        recorder = args.get("recorder", 1)
+        shortcut_name = "record_toggle" if recorder == 1 else f"record{recorder}_toggle"
+        resp = shortcut(shortcut_name, "0")
+        return f"Recorder {recorder} stop sent. Response: {resp}"
 
     if name == "get_record_state":
-        return _get_shortcut_state("record_toggle", "Recording")
+        recorder = args.get("recorder", 1)
+        shortcut_name = "record_toggle" if recorder == 1 else f"record{recorder}_toggle"
+        return _get_shortcut_state(shortcut_name, f"Recording (recorder {recorder})")
 
     # ── Streaming ────────────────────────────────────────────────────────
     if name == "start_stream":
@@ -509,6 +626,10 @@ def _handle(name: str, args: dict) -> str:
         return f"Take to black executed. Response: {resp}"
 
     # ── Audio mixer ──────────────────────────────────────────────────────
+    if name == "get_audio_state":
+        xml = dictionary("audiomixer")
+        return _parse_audio_state(xml)
+
     if name == "set_audio_mute":
         channel = args["channel"]
         mute_val = "true" if args["mute"] else "false"
@@ -523,6 +644,11 @@ def _handle(name: str, args: dict) -> str:
         return f"Channel '{channel}' volume set to {volume}. Response: {resp}"
 
     # ── DDR ──────────────────────────────────────────────────────────────
+    if name == "get_ddr_status":
+        ddr = args["ddr"]
+        xml = dictionary("ddr_timecode")
+        return _parse_ddr_status(xml, ddr)
+
     if name == "ddr_play":
         ddr = args["ddr"]
         resp = shortcut(f"ddr{ddr}_play")
@@ -546,6 +672,13 @@ def _handle(name: str, args: dict) -> str:
         resp = shortcut(f"ddr{ddr}_autoplay_mode_toggle", val)
         state = "enabled" if args["enabled"] else "disabled"
         return f"DDR{ddr} autoplay {state}. Response: {resp}"
+
+    # ── Media browser ─────────────────────────────────────────────────────
+    if name == "browse_media":
+        path = args.get("path", "")
+        key = f"filebrowser:{path}" if path else "filebrowser"
+        xml = dictionary(key)
+        return _parse_filebrowser(xml)
 
     # ── Macros ───────────────────────────────────────────────────────────
     if name == "list_macros":
@@ -582,18 +715,21 @@ def _handle(name: str, args: dict) -> str:
 # ---------------------------------------------------------------------------
 
 def _get_shortcut_state(shortcut_name: str, label: str) -> str:
-    """Read a single shortcut value from the shortcut_states dictionary."""
-    try:
-        xml = dictionary("shortcut_states")
-        root = ET.fromstring(xml)
-        for el in root:
-            if el.get("name") == shortcut_name:
-                val = el.get("value", "unknown")
-                state = "active" if val not in ("0", "false", "") else "inactive"
-                return f"{label}: {state} (raw value: {val!r})"
-        return f"{label}: unknown (shortcut '{shortcut_name}' not found in shortcut_states)"
-    except ET.ParseError:
-        return f"{label}: parse error reading shortcut_states"
+    """Read a single shortcut value from the switcher dictionary (faster than shortcut_states)."""
+    # Try the switcher dictionary first — smaller payload than shortcut_states (~400KB).
+    # Fall back to shortcut_states if not found.
+    for dict_key in ("switcher", "shortcut_states"):
+        try:
+            xml = dictionary(dict_key)
+            root = ET.fromstring(xml)
+            for el in root.iter():
+                if el.get("name") == shortcut_name:
+                    val = el.get("value", "unknown")
+                    state = "active" if val not in ("0", "false", "") else "inactive"
+                    return f"{label}: {state} (raw value: {val!r})"
+        except ET.ParseError:
+            continue
+    return f"{label}: unknown (shortcut '{shortcut_name}' not found)"
 
 
 def _parse_tally(xml: str) -> str:
@@ -609,7 +745,144 @@ def _parse_tally(xml: str) -> str:
         ]
         return "\n".join(lines)
     except ET.ParseError:
-        return xml  # return raw if parse fails
+        return xml
+
+
+def _parse_source_list(xml: str) -> str:
+    """Extract all source names from tally XML."""
+    try:
+        root = ET.fromstring(xml)
+        sources = [c.get("name") for c in root if c.get("name")]
+        if not sources:
+            return "No sources found.\n\nRaw:\n" + xml
+        return "=== Available Sources ===\n" + "\n".join(f"  {s}" for s in sources)
+    except ET.ParseError:
+        return xml
+
+
+def _parse_switcher_state(xml: str) -> str:
+    """Parse switcher XML into a human-readable summary."""
+    try:
+        root = ET.fromstring(xml)
+
+        def find_attr(tag: str, attr: str, default: str = "(unknown)") -> str:
+            el = root.find(f".//{tag}")
+            return el.get(attr, default) if el is not None else default
+
+        # Program / Preview
+        pgm = root.find(".//program") or root.find(".//a_row")
+        prev = root.find(".//preview") or root.find(".//b_row")
+        pgm_src = pgm.get("source", pgm.get("name", "(unknown)")) if pgm is not None else "(unknown)"
+        prev_src = prev.get("source", prev.get("name", "(unknown)")) if prev is not None else "(unknown)"
+
+        # Active transition effect
+        effect_el = root.find(".//transition") or root.find(".//effect")
+        effect = effect_el.get("name", effect_el.get("value", "(unknown)")) if effect_el is not None else "(unknown)"
+
+        # T-bar position
+        tbar_el = root.find(".//tbar") or root.find(".//t_bar")
+        tbar = tbar_el.get("value", "(unknown)") if tbar_el is not None else "(unknown)"
+
+        lines = [
+            "=== Switcher State ===",
+            f"Program:    {pgm_src}",
+            f"Preview:    {prev_src}",
+            f"Effect:     {effect}",
+            f"T-bar:      {tbar}",
+        ]
+
+        # DSK states
+        for dsk_el in root.findall(".//dsk"):
+            dsk_name = dsk_el.get("name", "")
+            dsk_on = dsk_el.get("on_air", dsk_el.get("active", ""))
+            if dsk_name:
+                lines.append(f"DSK {dsk_name}: {'ON' if dsk_on in ('true', '1') else 'off'}")
+
+        return "\n".join(lines)
+    except ET.ParseError:
+        return xml
+
+
+def _parse_audio_state(xml: str) -> str:
+    """Parse audiomixer XML into a readable channel summary."""
+    try:
+        root = ET.fromstring(xml)
+        lines = ["=== Audio Mixer State ==="]
+        channels_found = False
+
+        for ch in root.iter():
+            name = ch.get("name") or ch.get("id")
+            if not name:
+                continue
+            mute = ch.get("mute", ch.get("muted", ""))
+            volume = ch.get("volume", ch.get("gain", ch.get("level", "")))
+            if mute != "" or volume != "":
+                channels_found = True
+                mute_str = "MUTED" if mute in ("true", "1") else "unmuted" if mute != "" else ""
+                vol_str = f"vol={volume}" if volume != "" else ""
+                parts = [p for p in [mute_str, vol_str] if p]
+                lines.append(f"  {name}: {', '.join(parts) if parts else '(no data)'}")
+
+        if not channels_found:
+            lines.append("(No channel data found — raw XML returned)")
+            lines.append(xml)
+        return "\n".join(lines)
+    except ET.ParseError:
+        return xml
+
+
+def _parse_ddr_status(xml: str, ddr: int) -> str:
+    """Parse ddr_timecode XML for a specific DDR."""
+    try:
+        root = ET.fromstring(xml)
+
+        # Look for a DDR-specific element
+        ddr_el = root.find(f".//ddr[@id='{ddr}']") or root.find(f".//ddr{ddr}") or root.find(f".//*[@name='ddr{ddr}']")
+        if ddr_el is None:
+            # Try children matching by index
+            ddrs = list(root.iter("ddr"))
+            ddr_el = ddrs[ddr - 1] if len(ddrs) >= ddr else None
+
+        if ddr_el is None:
+            return f"DDR{ddr} status: not found in response.\n\nRaw:\n{xml}"
+
+        lines = [f"=== DDR{ddr} Status ==="]
+        for attr in ("timecode", "position", "clip", "filename", "state", "playing", "loop", "autoplay", "duration"):
+            val = ddr_el.get(attr)
+            if val is not None:
+                lines.append(f"  {attr}: {val}")
+
+        if len(lines) == 1:
+            lines.append("(No detailed attributes found)")
+            lines.append(f"Raw element: {ET.tostring(ddr_el, encoding='unicode')}")
+
+        return "\n".join(lines)
+    except ET.ParseError:
+        return xml
+
+
+def _parse_filebrowser(xml: str) -> str:
+    """Parse filebrowser XML into a readable file/folder list."""
+    try:
+        root = ET.fromstring(xml)
+        lines = ["=== Media Browser ==="]
+        entries = []
+
+        for el in root.iter():
+            name = el.get("name") or el.get("filename") or el.get("path")
+            if not name:
+                continue
+            kind = el.tag
+            entries.append(f"  [{kind}] {name}")
+
+        if not entries:
+            lines.append("(No entries found — raw XML returned)")
+            lines.append(xml)
+        else:
+            lines.extend(entries)
+        return "\n".join(lines)
+    except ET.ParseError:
+        return xml
 
 
 def _parse_macros(xml: str) -> str:
