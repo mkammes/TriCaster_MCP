@@ -2,7 +2,7 @@
 
 An MCP (Model Context Protocol) server that lets Claude control a Vizrt TriCaster via its HTTP API. Once installed, you can talk to Claude in plain English to control your TriCaster — switch sources, trigger transitions, manage recording and streaming, control audio, run macros, and more.
 
-Tested against: **TriCaster Mini S, v8-5, 1080p29.97**
+Tested against: **TriCaster Mini S, v8-5, 1080p29.97** and **TriCaster Mini X, v8-5, 1080p29.97**
 
 ---
 
@@ -357,40 +357,40 @@ Once installed, Claude has access to the following tools for controlling your Tr
 | Tool | Description |
 |---|---|
 | **System** | |
-| `get_system_info` | TriCaster model, version, session name, and resolution |
+| `get_system_info` | TriCaster model, version, session name, resolution, and frame rate |
 | `get_tally` | Shows which sources are currently on Program and Preview |
-| `list_sources` | List all available source names (inputs, DDRs, buffers, graphics, etc.) |
+| `list_sources` | List all available source names with their friendly labels (e.g. `input1 (INPUT 1)`) |
 | **Switcher** | |
-| `get_switcher_state` | Parsed switcher state: Program, Preview, active effect, T-bar position, DSK states |
+| `get_switcher_state` | Program source, Preview source, active effect, T-bar position, input labels, and overlay sources |
 | `switch_program` | Cut directly to a new Program source (goes to air immediately) |
 | `switch_preview` | Arm a new source on Preview without going to air |
 | `auto_transition` | Perform an Auto transition, taking Preview to Program using the current effect |
 | `cut_transition` | Perform an instant Cut, swapping Program and Preview |
-| `set_transition_effect` | Change the active transition effect (e.g. Dissolve, Wipe) |
+| `set_transition_effect` | Change the active transition effect — use `"fade"` or `"dissolve"` for dissolve, `"cut"` for cut, or a full effect file path for file-based effects |
 | `fade_to_black` | Fade the program output to black; call again to fade back up |
 | `take_to_black` | Instantly cut the program output to black |
 | **DSK** | |
 | `dsk_on` / `dsk_off` / `dsk_auto` | Bring DSK 1 or 2 on air, take it off, or auto-transition it |
 | **Audio** | |
-| `get_audio_state` | Get current mute and volume state for all audio channels |
+| `get_audio_state` | Mute status and volume level for every audio channel (master, inputs, DDRs, aux, phones) |
 | `set_audio_mute` | Mute or unmute an audio channel |
 | `set_audio_volume` | Set the volume/gain of an audio channel (0 = unity gain) |
 | **DDR (media players)** | |
-| `get_ddr_status` | Get playback state, timecode, clip name, loop/autoplay mode for a DDR |
+| `get_ddr_status` | Playback state, elapsed/remaining time, duration, playlist position, and frame rate for a DDR |
 | `ddr_play` / `ddr_stop` | Start or stop playback on DDR media player 1 or 2 |
 | `ddr_set_loop` | Enable or disable loop mode on a DDR |
 | `ddr_set_autoplay` | Enable or disable autoplay mode on a DDR |
 | **Recording & Streaming** | |
-| `start_record` / `stop_record` | Start or stop recording (optional `recorder` param for multi-recorder systems) |
+| `start_record` / `stop_record` | Start or stop recording; optional `recorder` number for multi-recorder systems (default: 1) |
 | `get_record_state` | Check whether recording is currently active |
 | `start_stream` / `stop_stream` | Start or stop streaming |
 | `get_stream_state` | Check whether streaming is currently active |
 | **Media & Macros** | |
-| `browse_media` | Browse available media files on the TriCaster file system |
-| `list_macros` | List all macros available on the TriCaster |
+| `browse_media` | List all media files on the TriCaster, grouped by folder |
+| `list_macros` | List all macros available on the TriCaster by name and ID |
 | `run_macro` | Execute a macro by name |
 | **Advanced** | |
-| `get_dictionary` | Read any TriCaster state dictionary (returns raw XML) |
+| `get_dictionary` | Read any TriCaster state dictionary by key (returns raw XML) |
 | `get_datalink` | Get all current DataLink key/value pairs (live data fields like scores, lower-thirds) |
 | `set_datalink` | Set a DataLink key to a value (e.g. update a score or lower-third text) |
 | `send_shortcut` | Send any raw shortcut command to the TriCaster |
@@ -399,7 +399,9 @@ Once installed, Claude has access to the following tools for controlling your Tr
 
 Use these names with `set_audio_mute` and `set_audio_volume`:
 
-`master`, `input1`, `input2`, `input3`, `input4`, `input5`, `input6`, `input7`, `input8`, `ddr1`, `ddr2`, `aux1`, `phones`
+`master`, `input1`–`input8`, `ddr1`, `ddr2`, `aux1`, `aux2`, `aux3`, `phones`
+
+> Use `get_audio_state` to see which channels your TriCaster model actually exposes — the exact list varies by model.
 
 ### Common source names
 
